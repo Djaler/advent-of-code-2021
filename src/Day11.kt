@@ -1,14 +1,14 @@
-typealias Grid = List<MutableList<Int>>
-
 fun main() {
-    fun parseGrid(input: List<String>): Grid {
+    fun parseGrid(input: List<String>): List<MutableList<Int>> {
         return input.map { line -> line.map { it.digitToInt() }.toMutableList() }
     }
 
     data class Coord(val x: Int, val y: Int)
 
-    operator fun Grid.get(coord: Coord) = this[coord.y][coord.x]
-    operator fun Grid.set(coord: Coord, value: Int) {
+    operator fun List<MutableList<Int>>.get(coord: Coord) =
+        this[coord.y][coord.x]
+
+    operator fun List<MutableList<Int>>.set(coord: Coord, value: Int) {
         this[coord.y][coord.x] = value
     }
 
@@ -16,7 +16,7 @@ fun main() {
         return flatMap { first -> other.map { second -> first to second } }
     }
 
-    fun findAdjacent(coord: Coord, grid: Grid): Collection<Coord> {
+    fun findAdjacent(coord: Coord, grid: List<MutableList<Int>>): Collection<Coord> {
         return (coord.x - 1..coord.x + 1).cartesianProduct(coord.y - 1..coord.y + 1)
             .asSequence()
             .filter { (x, y) -> x >= 0 }
@@ -28,11 +28,19 @@ fun main() {
             .toList()
     }
 
-    fun shouldFlash(coord: Coord, grid: Grid, flashing: Set<Coord>): Boolean {
+    fun shouldFlash(
+        coord: Coord,
+        grid: List<MutableList<Int>>,
+        flashing: Set<Coord>
+    ): Boolean {
         return grid[coord] > 9 && coord !in flashing
     }
 
-    fun flash(coord: Coord, grid: Grid, flashing: MutableSet<Coord>) {
+    fun flash(
+        coord: Coord,
+        grid: List<MutableList<Int>>,
+        flashing: MutableSet<Coord>
+    ) {
         flashing.add(coord)
         val findAdjacent = findAdjacent(coord, grid)
         for (adjacent in findAdjacent) {
@@ -46,7 +54,7 @@ fun main() {
         }
     }
 
-    fun step(grid: Grid): Int {
+    fun step(grid: List<MutableList<Int>>): Int {
         for (row in grid) {
             for (x in row.indices) {
                 row[x] += 1
